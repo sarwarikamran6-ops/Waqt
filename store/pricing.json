@@ -1,0 +1,11 @@
+{
+  "app": "Waqt",
+  "package": "app.waqt.prayer",
+  "paid": true,
+  "price": {
+    "country": "CA",
+    "currency": "CAD",
+    "amount": "1.99",
+    "note": "Set this exact amount on the Canada row in Play Console. Do not use an auto-converted price."
+  }
+}
