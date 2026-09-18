@@ -8,5 +8,6 @@
     "amount": "1.99",
     "note": "Set this exact amount on the Canada row in Play Console. Do not use an auto-converted price."
   },
-  "freeCode": "FAM786"
+  "freeCode": "FAM786",
+  "freeCodeRule": "FAM786 is valid for the first year, from 18 Sep 2026 through 17 Sep 2027. Each later year uses the year number in front: 2FAM786, then 3FAM786. A code from another year does not unlock."
 }

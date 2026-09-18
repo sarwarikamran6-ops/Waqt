@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { appYear, codeMatches, unlockIsCurrent } from "./free-code";
 import chaptersJson from "./chapters.json";
 import booksJson from "./hadith-books.json";
 import { DUAS, NAMES, PHRASES } from "./content";
@@ -12,12 +13,6 @@ const CHAPTERS = chaptersJson as Chapter[];
 const BOOKS = booksJson as Record<string, { name: string; sections: Record<string, string> }>;
 const BOOK_ORDER = ["bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "malik", "nawawi", "qudsi"];
 type Log = Record<string, Partial<Record<Salah, boolean>>>;
-
-const FREE_CODE = "FAM786";
-
-function codeMatches(value: string) {
-  return value.trim().toUpperCase() === FREE_CODE;
-}
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -86,7 +81,10 @@ function App() {
   });
   const [now, setNow] = useState(() => Date.now());
   const [banner, setBanner] = useState<string | null>(null);
-  const [free, setFree] = useState(() => localStorage.getItem("waqt-free") === "1");
+  const [free, setFree] = useState(() => {
+    if (unlockIsCurrent(localStorage.getItem("waqt-free-year"))) return true;
+    return appYear() === 1 && localStorage.getItem("waqt-free") === "1";
+  });
   const settingsRef = useRef(settings);
   const placeRef = useRef(place);
   settingsRef.current = settings;
@@ -235,7 +233,7 @@ function FreeCode({ lang, onUnlock }: { lang: Settings["lang"]; onUnlock: () => 
       setBad(true);
       return;
     }
-    localStorage.setItem("waqt-free", "1");
+    localStorage.setItem("waqt-free-year", String(appYear()));
     onUnlock();
   }
   return (
