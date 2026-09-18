@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import chaptersJson from "./chapters.json";
 import booksJson from "./hadith-books.json";
 import { DUAS, NAMES, PHRASES } from "./content";
@@ -12,6 +12,12 @@ const CHAPTERS = chaptersJson as Chapter[];
 const BOOKS = booksJson as Record<string, { name: string; sections: Record<string, string> }>;
 const BOOK_ORDER = ["bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "malik", "nawawi", "qudsi"];
 type Log = Record<string, Partial<Record<Salah, boolean>>>;
+
+const FREE_CODE = "FAM786";
+
+function codeMatches(value: string) {
+  return value.trim().toUpperCase() === FREE_CODE;
+}
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -80,6 +86,7 @@ function App() {
   });
   const [now, setNow] = useState(() => Date.now());
   const [banner, setBanner] = useState<string | null>(null);
+  const [free, setFree] = useState(() => localStorage.getItem("waqt-free") === "1");
   const settingsRef = useRef(settings);
   const placeRef = useRef(place);
   settingsRef.current = settings;
@@ -161,6 +168,7 @@ function App() {
   }, []);
 
   const lang = settings.lang;
+  if (!free) return <FreeCode lang={lang} onUnlock={() => setFree(true)} />;
   const model = {
     settings,
     setSettings,
@@ -215,6 +223,43 @@ function App() {
         {screen === "settings" && <SettingsView {...model} />}
       </main>
     </div>
+  );
+}
+
+function FreeCode({ lang, onUnlock }: { lang: Settings["lang"]; onUnlock: () => void }) {
+  const [code, setCode] = useState("");
+  const [bad, setBad] = useState(false);
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    if (!codeMatches(code)) {
+      setBad(true);
+      return;
+    }
+    localStorage.setItem("waqt-free", "1");
+    onUnlock();
+  }
+  return (
+    <main className="stage">
+      <form className="search" onSubmit={submit}>
+        <h1>{t(lang, "appName")}</h1>
+        <p className="lede">CA$1.99</p>
+        <label>
+          <span>{t(lang, "freeCode")}</span>
+          <input
+            value={code}
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
+            onChange={(event) => {
+              setCode(event.target.value);
+              setBad(false);
+            }}
+          />
+        </label>
+        {bad && <p className="warn">{t(lang, "freeWrong")}</p>}
+        <button className="primary" type="submit">{t(lang, "freeUnlock")}</button>
+      </form>
+    </main>
   );
 }
 

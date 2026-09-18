@@ -96,6 +96,9 @@ const dict = {
   save: { en: "Save", ar: "حفظ", fr: "Enregistrer" },
   saved: { en: "Saved", ar: "محفوظ", fr: "Enregistré" },
   remove: { en: "Remove", ar: "إزالة", fr: "Retirer" },
+  freeCode: { en: "Free code", ar: "رمز مجاني", fr: "Code gratuit" },
+  freeWrong: { en: "That code is not valid.", ar: "هذا الرمز غير صحيح.", fr: "Ce code n'est pas valable." },
+  freeUnlock: { en: "Unlock", ar: "فتح", fr: "Déverrouiller" },
 } as const;
 
 export type Key = keyof typeof dict;
