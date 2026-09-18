@@ -1,0 +1,17 @@
+{
+  "name": "Waqt",
+  "short_name": "Waqt",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3efe6",
+  "theme_color": "#17352a",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
