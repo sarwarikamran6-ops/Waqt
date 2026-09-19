@@ -6,15 +6,26 @@ export function norm360(value: number): number {
 
 export type HeadingEvent = {
   webkitCompassHeading?: number | null;
+  webkitCompassAccuracy?: number | null;
   alpha?: number | null;
   absolute?: boolean;
 };
 
-// iOS reports the screen-top heading. Android's absolute alpha is the device
-// frame, so the screen rotation is added only on that path.
-export function magneticHeading(event: HeadingEvent, screenAngle = 0): number | null {
+const POINTS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"] as const;
+
+export function compassPoint(degrees: number): (typeof POINTS)[number] {
+  return POINTS[Math.round(norm360(degrees) / 22.5) % 16];
+}
+
+// iOS webkitCompassHeading is the portrait top of the device, not the top of
+// the screen. window.orientation is 0 in portrait and ±90 in landscape, including
+// on iPad. Android absolute alpha uses the screen angle instead.
+export function magneticHeading(event: HeadingEvent, screenAngle = 0, windowOrientation = 0): number | null {
   const ios = event.webkitCompassHeading;
-  if (typeof ios === "number" && Number.isFinite(ios)) return norm360(ios);
+  if (typeof ios === "number" && Number.isFinite(ios)) {
+    if (typeof event.webkitCompassAccuracy === "number" && event.webkitCompassAccuracy < 0) return null;
+    return norm360(ios - windowOrientation);
+  }
   if (event.absolute === true && typeof event.alpha === "number" && Number.isFinite(event.alpha)) {
     return norm360(360 - event.alpha + screenAngle);
   }
