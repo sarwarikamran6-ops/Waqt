@@ -6,6 +6,7 @@ import { DUAS, NAMES, PHRASES } from "./content";
 import { t, type Key } from "./i18n";
 import { loadHadith, loadVerses, saveQuran, searchCities, translationEdition, type HadithRow, type Verse } from "./api";
 import { arrowDegrees, compassPoint, declination, magneticHeading, trueHeading, turnDelta } from "./qibla";
+import { ensureAdhanPermissions, isAndroidNative, playNativeAdhan, stopNativeAdhan, syncNativeAdhanSchedule } from "./adhan-native";
 import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, formatHijriMonth, hijriFrom, hijriMonthName, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
 import { DEFAULT_SETTINGS, METHODS, SALAHS, type Fav, type Place, type Salah, type Screen, type Settings, type Slot } from "./types";
 
@@ -69,19 +70,31 @@ function adhanUrl(kind: "fajr" | "regular"): string {
   return `${base}adhan/${kind}.mp3`;
 }
 
-function playAdhan(slot: Slot) {
-  const kind = slot === "fajr" ? "fajr" : "regular";
-  try {
-    if (adhanPlayer) {
-      adhanPlayer.pause();
-      adhanPlayer.currentTime = 0;
+function playAdhan(slot: Slot, title = "", body = "") {
+  const label = title || slot;
+  void (async () => {
+    if (await playNativeAdhan(slot, label, body)) return;
+    const kind = slot === "fajr" ? "fajr" : "regular";
+    try {
+      if (adhanPlayer) {
+        adhanPlayer.pause();
+        adhanPlayer.currentTime = 0;
+      }
+      const audio = new Audio(adhanUrl(kind));
+      adhanPlayer = audio;
+      audio.preload = "auto";
+      void audio.play().catch(() => playChime());
+    } catch {
+      playChime();
     }
-    const audio = new Audio(adhanUrl(kind));
-    adhanPlayer = audio;
-    audio.preload = "auto";
-    void audio.play().catch(() => playChime());
-  } catch {
-    playChime();
+  })();
+}
+
+function stopAdhan() {
+  void stopNativeAdhan();
+  if (adhanPlayer) {
+    adhanPlayer.pause();
+    adhanPlayer.currentTime = 0;
   }
 }
 
@@ -168,6 +181,8 @@ function App() {
       const prev = last;
       last = n;
       if (!currentPlace || !currentSettings.chime) return;
+      // On Android, AlarmManager + foreground service handle lock-screen Adhan.
+      if (isAndroidNative()) return;
       const today = civilFrom(new Date(n), currentPlace.timeZone);
       for (const day of [today, addDays(today, 1)]) {
         for (const slot of slotsFor(currentPlace, currentSettings, day)) {
@@ -176,11 +191,12 @@ function App() {
           const key = `${dayKey(day)}-${slot.slot}`;
           if (at > prev && at <= n && !fired.has(key)) {
             fired.add(key);
-            playAdhan(slot.slot);
             const label = t(currentSettings.lang, slot.slot);
+            const body = formatClock(slot.time, currentPlace.timeZone, currentSettings.lang);
+            playAdhan(slot.slot, label, body);
             setBanner(label);
             if (currentSettings.notify && "Notification" in window && Notification.permission === "granted") {
-              new Notification(label, { body: formatClock(slot.time, currentPlace.timeZone, currentSettings.lang) });
+              new Notification(label, { body });
             }
           }
         }
@@ -188,6 +204,10 @@ function App() {
     }, 1000);
     return () => window.clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    void syncNativeAdhanSchedule(place, settings);
+  }, [place, settings]);
 
   const lang = settings.lang;
   if (!free) return <FreeCode lang={lang} onUnlock={() => setFree(true)} />;
@@ -1109,34 +1129,40 @@ function SettingsView(m: Model) {
         <article className="card">
           <h2>{t(lang, "reminders")}</h2>
           <label className="toggle">
-            <input type="checkbox" checked={s.chime} onChange={(e) => patch({ chime: e.target.checked })} />
+            <input
+              type="checkbox"
+              checked={s.chime}
+              onChange={async (e) => {
+                const on = e.target.checked;
+                if (on && isAndroidNative()) await ensureAdhanPermissions();
+                patch({ chime: on });
+              }}
+            />
             {t(lang, "reminderChime")}
           </label>
           <p className="fine">{t(lang, "adhanNote")}</p>
+          {isAndroidNative() && <p className="fine">{t(lang, "lockScreenNote")}</p>}
           <div className="seg">
-            <button type="button" onClick={() => playAdhan("fajr")}>{t(lang, "playFajrAdhan")}</button>
-            <button type="button" onClick={() => playAdhan("dhuhr")}>{t(lang, "playRegularAdhan")}</button>
-            <button
-              type="button"
-              onClick={() => {
-                if (adhanPlayer) {
-                  adhanPlayer.pause();
-                  adhanPlayer.currentTime = 0;
-                }
-              }}
-            >
-              {t(lang, "stopAdhan")}
-            </button>
+            <button type="button" onClick={() => playAdhan("fajr", t(lang, "fajr"))}>{t(lang, "playFajrAdhan")}</button>
+            <button type="button" onClick={() => playAdhan("dhuhr", t(lang, "dhuhr"))}>{t(lang, "playRegularAdhan")}</button>
+            <button type="button" onClick={() => stopAdhan()}>{t(lang, "stopAdhan")}</button>
           </div>
           <label className="toggle">
             <input
               type="checkbox"
               checked={s.notify}
               onChange={async (e) => {
-                if (e.target.checked && "Notification" in window && Notification.permission !== "granted") {
-                  const result = await Notification.requestPermission();
-                  patch({ notify: result === "granted" });
-                  return;
+                if (e.target.checked) {
+                  if (isAndroidNative()) {
+                    const ok = await ensureAdhanPermissions();
+                    patch({ notify: ok });
+                    return;
+                  }
+                  if ("Notification" in window && Notification.permission !== "granted") {
+                    const result = await Notification.requestPermission();
+                    patch({ notify: result === "granted" });
+                    return;
+                  }
                 }
                 patch({ notify: e.target.checked });
               }}
