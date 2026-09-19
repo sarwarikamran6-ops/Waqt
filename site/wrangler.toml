@@ -1,0 +1,24 @@
+name = "shafi-apps"
+account_id = "9b6bbff8f60aa507eb7590e74fc17eaf"
+compatibility_date = "2026-09-19"
+workers_dev = true
+
+[assets]
+directory = "."
+not_found_handling = "404-page"
+
+[[routes]]
+pattern = "apps.shafiappco.com/*"
+zone_name = "shafiappco.com"
+
+[[routes]]
+pattern = "walkie.shafiappco.com/apps*"
+zone_name = "shafiappco.com"
+
+[[routes]]
+pattern = "walkie.shafiappco.com/downloads/shafi-waqt*"
+zone_name = "shafiappco.com"
+
+[[routes]]
+pattern = "walkie.shafiappco.com/downloads/waqt-*"
+zone_name = "shafiappco.com"

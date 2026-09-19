@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>ShafiAppCo — Downloads</title>
+    <meta name="description" content="Download ShafiAppCo Walkie Talkie and Waqt for Android." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg0: #0c1210;
+        --bg1: #152019;
+        --ink: #e8f0ea;
+        --muted: #8fa396;
+        --accent: #3dcf7a;
+        --card: rgba(255, 255, 255, 0.04);
+        --line: rgba(232, 240, 234, 0.12);
+        --warn: #e8b84a;
+        --gold: #d4b56a;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body {
+        font-family: "DM Sans", system-ui, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(900px 500px at 10% -10%, #1a4d32 0%, transparent 55%),
+          radial-gradient(700px 420px at 100% 0%, #243a55 0%, transparent 50%),
+          linear-gradient(165deg, var(--bg0), var(--bg1) 60%, #0a0f0d);
+      }
+      a { color: inherit; }
+      .wrap {
+        width: min(960px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2.5rem 0 4rem;
+      }
+      .nav {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.75rem;
+      }
+      .nav a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+      }
+      .nav a.on {
+        color: var(--ink);
+        border-color: var(--line);
+        background: var(--card);
+      }
+      .brand {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(2.4rem, 8vw, 4rem);
+        letter-spacing: 0.04em;
+        line-height: 0.95;
+        margin: 0 0 0.35rem;
+      }
+      .brand span { color: var(--accent); }
+      .tag {
+        color: var(--muted);
+        font-size: 1.05rem;
+        max-width: 36rem;
+        margin: 0 0 2rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 720px) {
+        .grid { grid-template-columns: 1fr 1fr; }
+      }
+      .app {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 1.4rem 1.35rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        min-height: 100%;
+        backdrop-filter: blur(8px);
+      }
+      .app h2 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2rem;
+        letter-spacing: 0.03em;
+        margin: 0;
+      }
+      .app p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.45;
+        flex: 1;
+      }
+      .meta {
+        font-size: 0.8rem;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.85rem;
+      }
+      .meta strong { color: var(--ink); font-weight: 500; }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 0.25rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 0.7rem 1.15rem;
+        font-weight: 700;
+        font-size: 0.92rem;
+        border: 1px solid transparent;
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+      .btn:active { transform: scale(0.98); }
+      .btn.primary {
+        background: var(--accent);
+        color: #062214;
+      }
+      .btn.primary:hover { background: #57e090; }
+      .btn.ghost {
+        border-color: var(--line);
+        background: transparent;
+        color: var(--ink);
+      }
+      .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+      .btn[aria-disabled="true"] {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+      .note {
+        margin-top: 2rem;
+        padding: 1rem 1.15rem;
+        border-left: 3px solid var(--warn);
+        background: rgba(232, 184, 74, 0.08);
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+      .note strong { color: var(--ink); }
+      .steps {
+        margin: 1.75rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.65rem;
+      }
+      .steps li {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+      .steps li strong { color: var(--ink); display: block; margin-bottom: 0.2rem; }
+      footer {
+        margin-top: 2.5rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <nav class="nav" aria-label="Site">
+        <a class="on" href="/apps/">Downloads</a>
+        <a href="/waqt/">Waqt</a>
+        <a href="https://walkie.shafiappco.com/">Walkie</a>
+      </nav>
+      <h1 class="brand">Shafi<span>App</span>Co</h1>
+      <p class="tag">Downloads — Android install packages for Walkie Talkie and Waqt, plus guides and privacy PDFs.</p>
+
+      <div class="grid">
+        <article class="app">
+          <h2>Walkie Talkie</h2>
+          <p>Push-to-talk radio with channels, chat, map, and company locks. Works as an Android app or in the browser.</p>
+          <div class="meta">
+            <span><strong>Platform</strong> Android 8+</span>
+            <span><strong>Format</strong> APK</span>
+            <span><strong>Web</strong> walkie.shafiappco.com</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" id="walkie-apk" href="https://walkie.shafiappco.com/downloads/shafi-walkie.apk" download>Download Walkie APK</a>
+            <a class="btn ghost" href="https://walkie.shafiappco.com/">Open in browser</a>
+          </div>
+        </article>
+
+        <article class="app">
+          <h2>Waqt</h2>
+          <p>Prayer times, Qibla compass, Hijri calendar, Quran, Hadith, Duas, and Adhan — built for daily use on Android and the web.</p>
+          <div class="meta">
+            <span><strong>Platform</strong> Android 7+</span>
+            <span><strong>Format</strong> APK</span>
+            <span><strong>Price</strong> CA$1.99</span>
+            <span><strong>Web</strong> waqt.shafiappco.com</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" id="waqt-apk" href="/downloads/shafi-waqt.apk" download>Download Waqt APK</a>
+            <a class="btn ghost" href="/waqt/">Waqt page</a>
+            <a class="btn ghost" href="https://waqt.plain-capri.workers.dev/">Open in browser</a>
+          </div>
+          <div class="actions">
+            <a class="btn ghost" href="/downloads/waqt-guide.pdf" download>Install guide PDF</a>
+            <a class="btn ghost" href="/downloads/waqt-about.pdf" download>About PDF</a>
+            <a class="btn ghost" href="/downloads/waqt-privacy.pdf" download>Privacy PDF</a>
+          </div>
+        </article>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <strong>1. Download the APK</strong>
+          Tap Download on your phone (Chrome / Files).
+        </li>
+        <li>
+          <strong>2. Allow install</strong>
+          Android may ask to allow installs from this browser — turn that on, then install.
+        </li>
+        <li>
+          <strong>3. Open the app</strong>
+          Launch from your app drawer. Set your city for prayer times and Qibla.
+        </li>
+      </ol>
+
+      <p class="note">
+        <strong>Tip:</strong> Prefer the browser first? Open Walkie or Waqt in Chrome, then Add to Home Screen for a full-screen app icon.
+      </p>
+
+      <footer>© ShafiAppCo · Downloads</footer>
+    </main>
+    <script>
+      async function check(id) {
+        const a = document.getElementById(id);
+        if (!a) return;
+        try {
+          const res = await fetch(a.getAttribute("href"), { method: "HEAD" });
+          if (!res.ok) a.setAttribute("aria-disabled", "true");
+          else a.removeAttribute("aria-disabled");
+        } catch {
+          a.setAttribute("aria-disabled", "true");
+        }
+      }
+      check("walkie-apk");
+      check("waqt-apk");
+    </script>
+  </body>
+</html>

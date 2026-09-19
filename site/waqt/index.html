@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Waqt — ShafiAppCo</title>
+    <meta name="description" content="Download Waqt by ShafiAppCo — prayer times, Qibla, Hijri calendar, Quran, and Adhan for Android." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,560&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f3efe6;
+        --ink: #17352a;
+        --muted: #5c6b62;
+        --card: #fffdf8;
+        --line: rgba(23, 53, 42, 0.12);
+        --accent: #17352a;
+        --gold: #b8923a;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body {
+        font-family: "DM Sans", system-ui, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(800px 420px at 0% 0%, rgba(184, 146, 58, 0.18), transparent 55%),
+          radial-gradient(700px 480px at 100% 10%, rgba(23, 53, 42, 0.12), transparent 50%),
+          var(--bg);
+      }
+      a { color: inherit; }
+      .wrap {
+        width: min(820px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2rem 0 4rem;
+      }
+      .nav {
+        display: flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+      .nav a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+      }
+      .nav a.on {
+        color: var(--ink);
+        border-color: var(--line);
+        background: var(--card);
+      }
+      .kicker {
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+        margin: 0 0 0.4rem;
+      }
+      h1 {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: clamp(2.6rem, 8vw, 3.6rem);
+        line-height: 1;
+        margin: 0 0 0.75rem;
+        font-weight: 560;
+      }
+      .lede {
+        font-size: 1.15rem;
+        color: var(--muted);
+        line-height: 1.5;
+        max-width: 34rem;
+        margin: 0 0 1.5rem;
+      }
+      .hero {
+        background: var(--accent);
+        color: #f6f1e6;
+        border-radius: 24px;
+        padding: 1.5rem 1.4rem 1.35rem;
+        margin-bottom: 1.25rem;
+      }
+      .hero p { margin: 0; color: #d9cbb4; }
+      .hero strong { color: #f6f1e6; font-size: 1.35rem; display: block; margin-top: 0.35rem; }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin: 1rem 0 1.75rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 0.75rem 1.2rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: 1px solid transparent;
+      }
+      .btn.primary { background: var(--accent); color: #f6f1e6; }
+      .btn.ghost {
+        background: var(--card);
+        border-color: var(--line);
+        color: var(--ink);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 1.25rem 1.2rem;
+        margin-bottom: 1rem;
+      }
+      .card h2 {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.35rem;
+        margin: 0 0 0.55rem;
+        font-weight: 560;
+      }
+      .card p, .card li {
+        color: var(--muted);
+        line-height: 1.5;
+        margin: 0;
+      }
+      .card ul {
+        margin: 0.4rem 0 0;
+        padding-left: 1.15rem;
+        display: grid;
+        gap: 0.35rem;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem 1rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+        margin-bottom: 1rem;
+      }
+      .meta strong { color: var(--ink); font-weight: 600; }
+      footer {
+        margin-top: 2rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <nav class="nav" aria-label="Site">
+        <a href="/apps/">Downloads</a>
+        <a class="on" href="/waqt/">Waqt</a>
+        <a href="https://walkie.shafiappco.com/">Walkie</a>
+      </nav>
+
+      <p class="kicker">ShafiAppCo</p>
+      <h1>Waqt</h1>
+      <p class="lede">
+        Daily prayer companion: accurate times for your city, Qibla with true north, Hijri date,
+        Quran, Hadith, Duas, and Adhan audio.
+      </p>
+
+      <div class="hero">
+        <p>Android package</p>
+        <strong>CA$1.99 · APK ready to install</strong>
+      </div>
+
+      <div class="meta">
+        <span><strong>Platform</strong> Android 7+</span>
+        <span><strong>Publisher</strong> ShafiAppCo</span>
+        <span><strong>Web</strong> waqt.plain-capri.workers.dev</span>
+      </div>
+
+      <div class="actions">
+        <a class="btn primary" href="/downloads/shafi-waqt.apk" download>Download Waqt APK</a>
+        <a class="btn ghost" href="https://waqt.plain-capri.workers.dev/">Open in browser</a>
+      </div>
+
+      <section class="card">
+        <h2>What’s inside</h2>
+        <ul>
+          <li>Prayer times with Muslim World League, ISNA, Umm al-Qura, and other methods</li>
+          <li>Qibla compass corrected for magnetic declination</li>
+          <li>Hijri month and day (Umm al-Qura)</li>
+          <li>Quran, Hadith, 99 Names, Duas, Tasbih, and favorites</li>
+          <li>Optional Fajr and regular Adhan while the app is open</li>
+          <li>English, Arabic, and French</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>Documents</h2>
+        <div class="actions" style="margin: 0.75rem 0 0">
+          <a class="btn ghost" href="/downloads/waqt-guide.pdf" download>Install &amp; use guide</a>
+          <a class="btn ghost" href="/downloads/waqt-about.pdf" download>About</a>
+          <a class="btn ghost" href="/downloads/waqt-privacy.pdf" download>Privacy</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Install on Android</h2>
+        <ul>
+          <li>Download the APK on your phone</li>
+          <li>Allow installs from the browser if asked</li>
+          <li>Open Waqt and set your city</li>
+        </ul>
+      </section>
+
+      <footer>© ShafiAppCo · Waqt</footer>
+    </main>
+  </body>
+</html>
