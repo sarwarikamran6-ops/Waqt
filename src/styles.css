@@ -217,11 +217,22 @@ input, select {
   position: relative;
   box-shadow: var(--shadow);
 }
-.n { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-weight: 600; }
-.mark-q {
-  position: absolute; inset: 18px;
-  background: linear-gradient(#e0c07a, #e0c07a) center top / 8px 46px no-repeat;
-  border-radius: 50%;
+.n, .e, .s, .w { position: absolute; font-weight: 600; }
+.n { top: 16px; left: 50%; transform: translateX(-50%); }
+.e { right: 16px; top: 50%; transform: translateY(-50%); }
+.s { bottom: 16px; left: 50%; transform: translateX(-50%); }
+.w { left: 16px; top: 50%; transform: translateY(-50%); }
+.qibla-arrow { position: absolute; inset: 0; }
+.qibla-arrow::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 11%;
+  width: 26px;
+  height: 39%;
+  transform: translateX(-50%);
+  background: #e0c07a;
+  clip-path: polygon(50% 0, 100% 26%, 62% 26%, 62% 100%, 38% 100%, 38% 26%, 0 26%);
 }
 .lubber {
   position: absolute; top: -6px; left: 50%; width: 0; height: 0; z-index: 2;

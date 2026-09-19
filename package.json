@@ -13,6 +13,7 @@
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",
     "adhan": "^4.4.3",
+    "magvar": "^2.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

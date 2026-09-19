@@ -5,6 +5,7 @@ import booksJson from "./hadith-books.json";
 import { DUAS, NAMES, PHRASES } from "./content";
 import { t, type Key } from "./i18n";
 import { loadHadith, loadVerses, saveQuran, searchCities, translationEdition, type HadithRow, type Verse } from "./api";
+import { arrowDegrees, declination, magneticHeading, trueHeading, turnDelta } from "./qibla";
 import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
 import { DEFAULT_SETTINGS, METHODS, SALAHS, type Fav, type Place, type Salah, type Screen, type Settings, type Slot } from "./types";
 
@@ -780,30 +781,35 @@ function QiblaView(m: Model) {
   ModelCtx.current = m;
   const lang = m.settings.lang;
   const [heading, setHeading] = useState<number | null>(null);
-  const listening = useRef(false);
+  const [armed, setArmed] = useState(false);
+
+  useEffect(() => {
+    if (!armed) return;
+    const handler = (event: Event) => {
+      const angle = window.screen?.orientation?.angle ?? 0;
+      const magnetic = magneticHeading(event as DeviceOrientationEvent, angle);
+      if (magnetic == null) return;
+      setHeading(magnetic);
+    };
+    window.addEventListener("deviceorientationabsolute", handler, true);
+    window.addEventListener("deviceorientation", handler, true);
+    return () => {
+      window.removeEventListener("deviceorientationabsolute", handler, true);
+      window.removeEventListener("deviceorientation", handler, true);
+    };
+  }, [armed]);
+
   if (!m.place) return <NeedPlace m={m} />;
   const qibla = qiblaBearing(m.place);
-  const rot = heading == null ? 0 : -heading;
+  const variation = declination(m.place.latitude, m.place.longitude);
+  const headingTrue = heading == null ? null : trueHeading(heading, variation);
+  const needle = arrowDegrees(qibla, headingTrue);
   let hint = t(lang, "northUp");
-  if (heading != null) {
-    const diff = ((qibla - heading + 540) % 360) - 180;
+  if (headingTrue != null) {
+    const diff = turnDelta(qibla, headingTrue);
     if (Math.abs(diff) < 6) hint = t(lang, "facingQibla");
     else if (diff > 0) hint = `${t(lang, "turnRight")} ${Math.round(diff)}°`;
     else hint = `${t(lang, "turnLeft")} ${Math.round(-diff)}°`;
-  }
-
-  function listen() {
-    if (listening.current) return;
-    listening.current = true;
-    const handler = (event: DeviceOrientationEvent) => {
-      const ios = (event as DeviceOrientationEvent & { webkitCompassHeading?: number }).webkitCompassHeading;
-      if (typeof ios === "number" && !Number.isNaN(ios)) {
-        setHeading(ios);
-        return;
-      }
-      if (event.alpha != null) setHeading((360 - event.alpha + 360) % 360);
-    };
-    window.addEventListener("deviceorientation", handler, true);
   }
 
   async function enable() {
@@ -812,11 +818,11 @@ function QiblaView(m: Model) {
       const result = await ctor.requestPermission();
       if (result !== "granted") return;
     }
-    listen();
+    setArmed(true);
   }
 
   return (
-    <section className="qibla">
+    <section className="qibla" data-qibla={Math.round(qibla)} data-needle={Math.round(needle)}>
       <header className="top">
         <div>
           <h1>{t(lang, "qibla")}</h1>
@@ -830,9 +836,12 @@ function QiblaView(m: Model) {
       </header>
       <div className="compass-wrap">
         <div className="lubber" />
-        <div className="dial" style={{ transform: `rotate(${rot}deg)` }}>
+        <div className="dial" style={{ transform: `rotate(${headingTrue == null ? 0 : -headingTrue}deg)` }}>
           <span className="n">N</span>
-          <span className="mark-q" style={{ transform: `rotate(${qibla}deg)` }} />
+          <span className="e">E</span>
+          <span className="s">S</span>
+          <span className="w">W</span>
+          <span className="qibla-arrow" style={{ transform: `rotate(${qibla}deg)` }} />
         </div>
       </div>
       <p className="hint">{hint}</p>
