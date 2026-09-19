@@ -6,6 +6,15 @@ workers_dev = true
 [assets]
 directory = "."
 not_found_handling = "404-page"
+html_handling = "auto-trailing-slash"
+
+[[routes]]
+pattern = "shafiappco.com/*"
+zone_name = "shafiappco.com"
+
+[[routes]]
+pattern = "www.shafiappco.com/*"
+zone_name = "shafiappco.com"
 
 [[routes]]
 pattern = "apps.shafiappco.com/*"
