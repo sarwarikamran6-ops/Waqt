@@ -62,6 +62,29 @@ function playChime() {
   window.setTimeout(() => void ctx.close(), 2200);
 }
 
+let adhanPlayer: HTMLAudioElement | null = null;
+
+function adhanUrl(kind: "fajr" | "regular"): string {
+  const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
+  return `${base}adhan/${kind}.mp3`;
+}
+
+function playAdhan(slot: Slot) {
+  const kind = slot === "fajr" ? "fajr" : "regular";
+  try {
+    if (adhanPlayer) {
+      adhanPlayer.pause();
+      adhanPlayer.currentTime = 0;
+    }
+    const audio = new Audio(adhanUrl(kind));
+    adhanPlayer = audio;
+    audio.preload = "auto";
+    void audio.play().catch(() => playChime());
+  } catch {
+    playChime();
+  }
+}
+
 function App() {
   const [settings, setSettingsState] = useState<Settings>(loadSettings);
   const [place, setPlaceState] = useState<Place | null>(loadPlace);
@@ -153,7 +176,7 @@ function App() {
           const key = `${dayKey(day)}-${slot.slot}`;
           if (at > prev && at <= n && !fired.has(key)) {
             fired.add(key);
-            playChime();
+            playAdhan(slot.slot);
             const label = t(currentSettings.lang, slot.slot);
             setBanner(label);
             if (currentSettings.notify && "Notification" in window && Notification.permission === "granted") {
@@ -1080,6 +1103,22 @@ function SettingsView(m: Model) {
             <input type="checkbox" checked={s.chime} onChange={(e) => patch({ chime: e.target.checked })} />
             {t(lang, "reminderChime")}
           </label>
+          <p className="fine">{t(lang, "adhanNote")}</p>
+          <div className="seg">
+            <button type="button" onClick={() => playAdhan("fajr")}>{t(lang, "playFajrAdhan")}</button>
+            <button type="button" onClick={() => playAdhan("dhuhr")}>{t(lang, "playRegularAdhan")}</button>
+            <button
+              type="button"
+              onClick={() => {
+                if (adhanPlayer) {
+                  adhanPlayer.pause();
+                  adhanPlayer.currentTime = 0;
+                }
+              }}
+            >
+              {t(lang, "stopAdhan")}
+            </button>
+          </div>
           <label className="toggle">
             <input
               type="checkbox"
