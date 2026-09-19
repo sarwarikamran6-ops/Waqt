@@ -1,0 +1,10 @@
+fajr.mp3
+  Madinah Fajr Azan by Sheikh Faisal Numan
+  Source: https://archive.org/details/MadinahFajrAzan
+  License: CC0 1.0 Universal (public domain dedication)
+
+regular.mp3
+  Adhan recording from Islamic Network / AlAdhan CDN (a1.mp3)
+  Source: https://cdn.aladhan.com/audio/adhans/a1.mp3
+  Bundling permitted for apps; attribution not required
+  https://community.islamic.network/d/255
