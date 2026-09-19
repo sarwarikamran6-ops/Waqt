@@ -195,8 +195,11 @@ input, select {
 .star.on { background: #17352a; color: var(--gold); }
 .book-row, .chips, .seg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .chip, .seg button { padding: 8px 12px; border-radius: 999px; background: var(--card); }
-.month-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.month-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
 .month-bar button { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); font-size: 22px; }
+.month-title { text-align: center; display: grid; gap: 2px; min-width: 0; }
+.month-title strong { font-size: 16px; line-height: 1.25; }
+.month-title span { color: var(--muted); font-size: 13px; }
 .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .dow { text-align: center; color: var(--muted); font-size: 12px; }
 .day { min-height: 58px; display: grid; place-items: center; align-content: center; gap: 2px; padding: 4px; }

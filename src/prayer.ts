@@ -93,14 +93,95 @@ export function formatClock(date: Date, timeZone: string, lang: string): string 
   }).format(date);
 }
 
-export function formatHijri(date: Date, timeZone: string, lang: string): string {
-  const locale = lang === "ar" ? "ar-u-ca-islamic-umalqura" : lang === "fr" ? "fr-u-ca-islamic-umalqura" : "en-u-ca-islamic-umalqura";
-  return new Intl.DateTimeFormat(locale, {
+export type Hijri = { year: number; month: number; day: number };
+
+const HIJRI_MONTHS: Record<"en" | "ar" | "fr", readonly string[]> = {
+  en: [
+    "Muharram",
+    "Safar",
+    "Rabi al-Awwal",
+    "Rabi al-Thani",
+    "Jumada al-Awwal",
+    "Jumada al-Thani",
+    "Rajab",
+    "Shaban",
+    "Ramadan",
+    "Shawwal",
+    "Dhul Qadah",
+    "Dhul Hijjah",
+  ],
+  ar: [
+    "محرم",
+    "صفر",
+    "ربيع الأول",
+    "ربيع الثاني",
+    "جمادى الأولى",
+    "جمادى الآخرة",
+    "رجب",
+    "شعبان",
+    "رمضان",
+    "شوال",
+    "ذو القعدة",
+    "ذو الحجة",
+  ],
+  fr: [
+    "Mouharram",
+    "Safar",
+    "Rabi al-Awwal",
+    "Rabi al-Thani",
+    "Joumada al-Oula",
+    "Joumada al-Thania",
+    "Rajab",
+    "Chaabane",
+    "Ramadan",
+    "Chawwal",
+    "Dhou al-Qada",
+    "Dhou al-Hijja",
+  ],
+};
+
+function hijriLang(lang: string): "en" | "ar" | "fr" {
+  return lang === "ar" || lang === "fr" ? lang : "en";
+}
+
+function localDigits(n: number, lang: string): string {
+  const text = String(n);
+  if (lang !== "ar") return text;
+  return text.replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
+}
+
+export function hijriFrom(date: Date, timeZone: string): Hijri {
+  const parts = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
     timeZone,
     day: "numeric",
-    month: "long",
+    month: "numeric",
     year: "numeric",
-  }).format(date);
+  }).formatToParts(date);
+  const n = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return { year: n("year"), month: n("month"), day: n("day") };
+}
+
+export function hijriMonthName(month: number, lang: string): string {
+  return HIJRI_MONTHS[hijriLang(lang)][month - 1] ?? "";
+}
+
+export function formatHijriMonth(start: Hijri, end: Hijri, lang: string): string {
+  const a = hijriMonthName(start.month, lang);
+  const b = hijriMonthName(end.month, lang);
+  const y1 = localDigits(start.year, lang);
+  const y2 = localDigits(end.year, lang);
+  if (start.year === end.year && start.month === end.month) return `${a} ${y1}`;
+  if (start.year === end.year) return `${a} – ${b} ${y2}`;
+  return `${a} ${y1} – ${b} ${y2}`;
+}
+
+export function formatHijri(date: Date, timeZone: string, lang: string): string {
+  const h = hijriFrom(date, timeZone);
+  const name = hijriMonthName(h.month, lang);
+  const day = localDigits(h.day, lang);
+  const year = localDigits(h.year, lang);
+  if (lang === "ar") return `${day} ${name} ${year} هـ`;
+  return `${day} ${name} ${year} AH`;
 }
 
 export function formatGregorian(date: Date, timeZone: string, lang: string): string {

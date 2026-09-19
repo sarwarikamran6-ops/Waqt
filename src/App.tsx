@@ -6,7 +6,7 @@ import { DUAS, NAMES, PHRASES } from "./content";
 import { t, type Key } from "./i18n";
 import { loadHadith, loadVerses, saveQuran, searchCities, translationEdition, type HadithRow, type Verse } from "./api";
 import { arrowDegrees, compassPoint, declination, magneticHeading, trueHeading, turnDelta } from "./qibla";
-import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
+import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, formatHijriMonth, hijriFrom, hijriMonthName, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
 import { DEFAULT_SETTINGS, METHODS, SALAHS, type Fav, type Place, type Salah, type Screen, type Settings, type Slot } from "./types";
 
 type Chapter = { n: number; en: string; name: string; ar: string; verses: number; place: string };
@@ -440,12 +440,15 @@ function Today(m: Model) {
   const next = upcoming ?? slotsFor(place, m.settings, addDays(today, 1))[0];
   const key = dayKey(today);
   const logged = SALAHS.filter((s) => m.log[key]?.[s]).length;
-  const monthPrefix = `${today.year}-${String(today.month).padStart(2, "0")}`;
+  const noon = noonInZone(today, place.timeZone);
+  const hijriToday = hijriFrom(noon, place.timeZone);
   const monthTotal = Object.entries(m.log).reduce((sum, [k, v]) => {
-    if (!k.startsWith(monthPrefix)) return sum;
+    const [y, mo, d] = k.split("-").map(Number);
+    if (!y || !mo || !d) return sum;
+    const h = hijriFrom(noonInZone({ year: y, month: mo, day: d }, place.timeZone), place.timeZone);
+    if (h.year !== hijriToday.year || h.month !== hijriToday.month) return sum;
     return sum + SALAHS.filter((s) => v[s]).length;
   }, 0);
-  const noon = noonInZone(today, place.timeZone);
 
   return (
     <section>
@@ -499,7 +502,7 @@ function Today(m: Model) {
             </div>
           </article>
           <article className="card">
-            <p className="kicker">{t(lang, "thisMonth")}</p>
+            <p className="kicker">{hijriMonthName(hijriToday.month, lang)}</p>
             <p className="stat">{monthTotal}</p>
           </article>
         </aside>
@@ -518,13 +521,16 @@ function Prayers(m: Model) {
   if (!place) return <NeedPlace m={m} />;
   const slots = slotsFor(place, m.settings, selected);
   const noon = noonInZone(cursor, place.timeZone);
-  const monthLabel = new Intl.DateTimeFormat(lang === "ar" ? "ar" : lang === "fr" ? "fr-FR" : "en-US", {
+  const gregorianLabel = new Intl.DateTimeFormat(lang === "ar" ? "ar" : lang === "fr" ? "fr-FR" : "en-US", {
     month: "long",
     year: "numeric",
     timeZone: place.timeZone,
   }).format(noon);
   const days = new Date(Date.UTC(cursor.year, cursor.month, 0)).getUTCDate();
   const first = noonInZone({ year: cursor.year, month: cursor.month, day: 1 }, place.timeZone);
+  const firstHijri = hijriFrom(first, place.timeZone);
+  const lastHijri = hijriFrom(noonInZone({ year: cursor.year, month: cursor.month, day: days }, place.timeZone), place.timeZone);
+  const hijriLabel = formatHijriMonth(firstHijri, lastHijri, lang);
   const wd = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: place.timeZone }).format(first);
   const pad = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(wd);
   const heads = Array.from({ length: 7 }, (_, i) =>
@@ -549,7 +555,10 @@ function Prayers(m: Model) {
         <article className="card">
           <div className="month-bar">
             <button onClick={() => move(-1)} aria-label="prev">‹</button>
-            <strong>{monthLabel}</strong>
+            <div className="month-title">
+              <strong>{hijriLabel}</strong>
+              <span>{gregorianLabel}</span>
+            </div>
             <button onClick={() => move(1)} aria-label="next">›</button>
           </div>
           <div className="cal">
@@ -563,13 +572,13 @@ function Prayers(m: Model) {
               const day = i + 1;
               const on = selected.year === cursor.year && selected.month === cursor.month && selected.day === day;
               const isToday = today.year === cursor.year && today.month === cursor.month && today.day === day;
-              const hijri = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { day: "numeric", timeZone: place.timeZone }).format(
-                noonInZone({ year: cursor.year, month: cursor.month, day }, place.timeZone),
-              );
+              const at = noonInZone({ year: cursor.year, month: cursor.month, day }, place.timeZone);
+              const hijri = hijriFrom(at, place.timeZone);
+              const hijriDay = lang === "ar" ? hijri.day.toLocaleString("ar-EG") : String(hijri.day);
               return (
-                <button key={day} className={on ? "day on" : isToday ? "day today" : "day"} onClick={() => setSelected({ year: cursor.year, month: cursor.month, day })}>
+                <button key={day} className={on ? "day on" : isToday ? "day today" : "day"} title={formatHijri(at, place.timeZone, lang)} onClick={() => setSelected({ year: cursor.year, month: cursor.month, day })}>
                   <b>{day}</b>
-                  <small>{hijri}</small>
+                  <small>{hijriDay}</small>
                 </button>
               );
             })}
