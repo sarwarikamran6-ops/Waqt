@@ -76,9 +76,17 @@ body { background: var(--paper); }
 
 .stage {
   overflow: auto;
-  padding: calc(22px + env(safe-area-inset-top)) 32px calc(28px + env(safe-area-inset-bottom));
+  padding: calc(16px + env(safe-area-inset-top)) 24px calc(20px + env(safe-area-inset-bottom));
   height: 100dvh;
+  min-height: 0;
 }
+.stage:has(.tasbih) {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.stage:has(.tasbih) > .banner { flex: 0 0 auto; }
+.stage:has(.tasbih) > .tasbih { flex: 1 1 auto; min-height: 0; }
 .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 18px; }
 h1, h2, h3 { font-family: Fraunces, Georgia, serif; font-weight: 560; letter-spacing: -0.03em; margin: 0; }
 h1 { font-size: 40px; line-height: 1.05; }
@@ -205,8 +213,24 @@ input, select {
 .day.today { box-shadow: inset 0 0 0 1.5px var(--gold); }
 .day.on small { color: #d9cbb4; }
 
-.qibla, .tasbih { display: flex; flex-direction: column; align-items: center; }
-.qibla .top, .tasbih .top { width: 100%; }
+.qibla, .tasbih { display: flex; flex-direction: column; align-items: center; min-height: 0; }
+.qibla .top, .tasbih .top { width: 100%; margin-bottom: 10px; }
+.tasbih {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  gap: 8px;
+  justify-content: flex-start;
+}
+.tasbih .chips {
+  width: 100%;
+  max-height: 5.5rem;
+  overflow: auto;
+  margin-bottom: 4px;
+  flex: 0 0 auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tasbih .top h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); }
 .compass-wrap { position: relative; width: min(420px, 80vw); height: min(420px, 80vw); margin: 12px 0; }
 .dial {
   width: 100%; height: 100%; border-radius: 50%;
@@ -241,27 +265,58 @@ input, select {
 .hint { font-size: 22px; }
 
 .pad {
-  width: min(460px, 86vw); height: min(460px, 70dvh);
+  --pad-size: min(300px, 72vw, 46dvh);
+  width: var(--pad-size);
+  height: var(--pad-size);
+  flex: 0 0 auto;
   border-radius: 50%;
   border: 0;
   background: #17352a;
   color: #f6f1e6;
-  display: grid; place-items: center; align-content: center;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  padding: 12% 10%;
   box-shadow: var(--shadow);
   touch-action: manipulation;
 }
-.pad strong { font-family: Fraunces, Georgia, serif; font-size: 92px; line-height: 1; font-variant-numeric: tabular-nums; }
-.pad em { font-style: normal; color: var(--gold); }
+.pad .phrase {
+  font-size: clamp(1.45rem, 5.6vw, 2.15rem) !important;
+  line-height: 1.3 !important;
+  max-width: 92%;
+  text-wrap: balance;
+  margin: 0 !important;
+}
+.pad .arabic { margin: 0; line-height: 1.3; }
+.pad-en {
+  display: block;
+  color: #d9cbb4;
+  font-size: clamp(0.95rem, 3.2vw, 1.15rem);
+  font-weight: 600;
+  line-height: 1.2;
+  max-width: 92%;
+}
+.pad strong {
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(2.6rem, 11vw, 3.8rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pad em {
+  font-style: normal;
+  color: var(--gold);
+  font-size: clamp(0.85rem, 2.8vw, 1rem);
+}
 .pad-total {
   display: block;
-  margin-top: 8px;
+  margin-top: 2px;
   color: #d9cbb4;
-  font-size: 15px;
+  font-size: clamp(0.8rem, 2.6vw, 0.95rem);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.phrase { font-size: 1.6rem !important; color: #f6f1e6; }
-.pad.done { outline: 6px solid var(--gold); }
+.pad.done { outline: 4px solid var(--gold); }
 .chip { position: relative; }
 .chip-stat {
   display: inline-flex;
@@ -279,27 +334,29 @@ input, select {
 .tasbih-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: min(420px, 100%);
-  margin-top: 14px;
+  gap: 8px;
+  width: min(320px, 100%);
+  margin-top: 4px;
+  flex: 0 0 auto;
 }
 .tasbih-stats p {
   margin: 0;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 12px 14px;
+  border-radius: 14px;
+  padding: 8px 12px;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 8px;
 }
-.tasbih-stats span { color: var(--muted); font-size: 13px; }
+.tasbih-stats span { color: var(--muted); font-size: 12px; }
 .tasbih-stats strong {
   font-family: Fraunces, Georgia, serif;
-  font-size: 28px;
+  font-size: 22px;
   font-variant-numeric: tabular-nums;
 }
+.tasbih .text { margin-top: 2px; padding: 6px 12px; flex: 0 0 auto; }
 .name-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
 .name { padding: 12px; text-align: center; display: grid; gap: 4px; }
 .name small, .name em { color: var(--muted); font-style: normal; }
@@ -332,9 +389,11 @@ input[type="checkbox"] { accent-color: #1d6b45; width: 18px; height: 18px; }
   .nav-btn span, .brand div { display: none; }
   .brand { justify-content: center; }
   .nav { padding-inline: 8px; }
-  .stage { padding-inline: 16px; }
+  .stage { padding-inline: 14px; padding-block: calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-bottom)); }
   .columns, .split { grid-template-columns: 1fr; }
   .hero h2 { font-size: 48px; }
+  .pad { --pad-size: min(270px, 78vw, 40dvh); }
+  .tasbih .chips { max-height: 4.6rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto; }
