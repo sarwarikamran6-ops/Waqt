@@ -933,6 +933,7 @@ function Tasbih(m: Model) {
           {[33, 99, 100].map((n) => (
             <button
               key={n}
+              type="button"
               className={target === n ? "on" : ""}
               onClick={() => {
                 setTarget(n);
@@ -944,79 +945,60 @@ function Tasbih(m: Model) {
           ))}
         </div>
       </header>
-      <div className="phrase-picker">
-        <button
-          type="button"
-          className="step"
-          aria-label="Previous phrase"
-          onClick={() => {
-            setPhrase((i) => (i - 1 + PHRASES.length) % PHRASES.length);
-            setCount(0);
-          }}
-        >
-          ‹
-        </button>
-        <select
-          value={phrase}
-          aria-label="Phrase"
-          onChange={(e) => {
-            setPhrase(Number(e.target.value));
-            setCount(0);
-          }}
-        >
+      <div className="tasbih-body">
+        <aside className="phrase-list" aria-label="Phrases">
           {PHRASES.map((p, i) => {
             const s = stats[p.id];
-            const taps = s && s.taps > 0 ? ` · ${s.taps}` : "";
             return (
-              <option key={p.id} value={i}>
-                {p.en}
-                {taps}
-              </option>
+              <button
+                key={p.id}
+                type="button"
+                className={i === phrase ? "phrase-item on" : "phrase-item"}
+                onClick={() => {
+                  setPhrase(i);
+                  setCount(0);
+                }}
+              >
+                <span className="phrase-item-en">{p.en}</span>
+                <span className="arabic phrase-item-ar">{p.ar}</span>
+                {s && s.taps > 0 ? <small className="chip-stat">{s.taps}</small> : null}
+              </button>
             );
           })}
-        </select>
-        <button
-          type="button"
-          className="step"
-          aria-label="Next phrase"
-          onClick={() => {
-            setPhrase((i) => (i + 1) % PHRASES.length);
-            setCount(0);
-          }}
-        >
-          ›
-        </button>
+        </aside>
+        <div className="tasbih-main">
+          <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count} of ${target}`}>
+            <span className="pad-inner">
+              <span className="arabic phrase">{item.ar}</span>
+              <span className="pad-en">{item.en}</span>
+              <strong>{count}</strong>
+              <em>
+                {count}/{target}
+              </em>
+            </span>
+          </button>
+          <div className="tasbih-stats">
+            <p>
+              <span>{t(lang, "roundsDone")}</span>
+              <strong>{mine.rounds}</strong>
+            </p>
+            <p>
+              <span>{t(lang, "totalTaps")}</span>
+              <strong>{mine.taps}</strong>
+            </p>
+          </div>
+          <button
+            type="button"
+            className="text"
+            onClick={() => {
+              setCount(0);
+            }}
+          >
+            {t(lang, "reset")}
+          </button>
+          <p className="build-tag">Waqt 2.3</p>
+        </div>
       </div>
-      <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count} of ${target}`}>
-        <span className="pad-inner">
-          <span className="arabic phrase">{item.ar}</span>
-          <span className="pad-en">{item.en}</span>
-          <strong>{count}</strong>
-          <em>
-            {count}/{target}
-          </em>
-        </span>
-      </button>
-      <div className="tasbih-stats">
-        <p>
-          <span>{t(lang, "roundsDone")}</span>
-          <strong>{mine.rounds}</strong>
-        </p>
-        <p>
-          <span>{t(lang, "totalTaps")}</span>
-          <strong>{mine.taps}</strong>
-        </p>
-      </div>
-      <button
-        type="button"
-        className="text"
-        onClick={() => {
-          setCount(0);
-        }}
-      >
-        {t(lang, "reset")}
-      </button>
-      <p className="build-tag">Waqt 2.2</p>
     </section>
   );
 }
