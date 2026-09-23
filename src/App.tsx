@@ -944,24 +944,48 @@ function Tasbih(m: Model) {
           ))}
         </div>
       </header>
-      <div className="chips">
-        {PHRASES.map((p, i) => {
-          const s = stats[p.id];
-          return (
-            <button
-              key={p.id}
-              type="button"
-              className={i === phrase ? "chip on" : "chip"}
-              onClick={() => {
-                setPhrase(i);
-                setCount(0);
-              }}
-            >
-              {p.en}
-              {s && s.taps > 0 ? <small className="chip-stat">{s.taps}</small> : null}
-            </button>
-          );
-        })}
+      <div className="phrase-picker">
+        <button
+          type="button"
+          className="step"
+          aria-label="Previous phrase"
+          onClick={() => {
+            setPhrase((i) => (i - 1 + PHRASES.length) % PHRASES.length);
+            setCount(0);
+          }}
+        >
+          ‹
+        </button>
+        <select
+          value={phrase}
+          aria-label="Phrase"
+          onChange={(e) => {
+            setPhrase(Number(e.target.value));
+            setCount(0);
+          }}
+        >
+          {PHRASES.map((p, i) => {
+            const s = stats[p.id];
+            const taps = s && s.taps > 0 ? ` · ${s.taps}` : "";
+            return (
+              <option key={p.id} value={i}>
+                {p.en}
+                {taps}
+              </option>
+            );
+          })}
+        </select>
+        <button
+          type="button"
+          className="step"
+          aria-label="Next phrase"
+          onClick={() => {
+            setPhrase((i) => (i + 1) % PHRASES.length);
+            setCount(0);
+          }}
+        >
+          ›
+        </button>
       </div>
       <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count} of ${target}`}>
         <span className="pad-inner">
@@ -992,7 +1016,7 @@ function Tasbih(m: Model) {
       >
         {t(lang, "reset")}
       </button>
-      <p className="build-tag">Waqt 2.1</p>
+      <p className="build-tag">Waqt 2.2</p>
     </section>
   );
 }
