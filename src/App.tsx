@@ -1078,7 +1078,7 @@ function Tasbih(m: Model) {
             {t(lang, "resetCounts")}
           </button>
           <p className="fine">{t(lang, "roundsStayNote")}</p>
-          <p className="build-tag">Waqt 2.8</p>
+          <p className="build-tag">Waqt 2.9</p>
         </div>
       </div>
     </section>
