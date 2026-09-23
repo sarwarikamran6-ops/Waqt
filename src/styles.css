@@ -299,6 +299,8 @@ input, select {
   position: absolute;
   top: 8px;
   inset-inline-end: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .tasbih-main {
   min-height: 0;

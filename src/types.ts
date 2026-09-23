@@ -48,6 +48,7 @@ export type Settings = {
   theme: Theme;
   chime: boolean;
   notify: boolean;
+  autoLocation: boolean;
   offsets: Offsets;
 };
 
@@ -85,5 +86,6 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: "system",
   chime: true,
   notify: false,
+  autoLocation: true,
   offsets: { fajr: 0, sunrise: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
 };

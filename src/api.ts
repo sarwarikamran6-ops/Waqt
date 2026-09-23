@@ -79,16 +79,86 @@ export type GeoHit = {
 };
 
 export async function searchCities(query: string, signal: AbortSignal): Promise<GeoHit[]> {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`;
+  // Photon supports full street addresses and place names.
+  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6`;
   const res = await fetch(url, { signal });
   if (!res.ok) throw new Error(String(res.status));
   const data = (await res.json()) as {
-    results?: { name: string; country?: string; admin1?: string; latitude: number; longitude: number; timezone?: string }[];
+    features?: {
+      geometry: { coordinates: [number, number] };
+      properties: {
+        name?: string;
+        street?: string;
+        housenumber?: string;
+        city?: string;
+        town?: string;
+        village?: string;
+        state?: string;
+        country?: string;
+        postcode?: string;
+        timezone?: string;
+      };
+    }[];
   };
-  return (data.results ?? []).map((r) => ({
-    label: [r.name, r.admin1, r.country].filter(Boolean).join(", "),
-    latitude: r.latitude,
-    longitude: r.longitude,
-    timeZone: r.timezone || "UTC",
-  }));
+  return (data.features ?? []).map((f) => {
+    const p = f.properties;
+    const line1 = [p.housenumber, p.street || p.name].filter(Boolean).join(" ").trim();
+    const place = p.city || p.town || p.village || p.name;
+    const label = [line1 && line1 !== place ? line1 : null, place, p.state, p.country, p.postcode]
+      .filter(Boolean)
+      .filter((v, i, arr) => arr.indexOf(v) === i)
+      .join(", ");
+    return {
+      label: label || `${f.geometry.coordinates[1].toFixed(4)}, ${f.geometry.coordinates[0].toFixed(4)}`,
+      latitude: f.geometry.coordinates[1],
+      longitude: f.geometry.coordinates[0],
+      timeZone: p.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+    };
+  });
+}
+
+export async function reverseGeocode(latitude: number, longitude: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://photon.komoot.io/reverse?lat=${latitude}&lon=${longitude}&limit=1`,
+    );
+    if (res.ok) {
+      const data = (await res.json()) as {
+        features?: { properties: Record<string, string | undefined> }[];
+      };
+      const p = data.features?.[0]?.properties;
+      if (p) {
+        const line1 = [p.housenumber, p.street || p.name].filter(Boolean).join(" ").trim();
+        const place = p.city || p.town || p.village || p.name;
+        const label = [line1 && line1 !== place ? line1 : null, place, p.state, p.country]
+          .filter(Boolean)
+          .filter((v, i, arr) => arr.indexOf(v) === i)
+          .join(", ");
+        if (label) return label;
+      }
+    }
+  } catch {
+    /* fall through */
+  }
+  try {
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+    );
+    if (res.ok) {
+      const data = (await res.json()) as {
+        city?: string;
+        locality?: string;
+        principalSubdivision?: string;
+        countryName?: string;
+      };
+      const label = [data.locality || data.city, data.principalSubdivision, data.countryName]
+        .filter(Boolean)
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .join(", ");
+      if (label) return label;
+    }
+  } catch {
+    /* coordinates are enough */
+  }
+  return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 }

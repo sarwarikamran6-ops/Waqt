@@ -5,7 +5,7 @@ import chaptersJson from "./chapters.json";
 import booksJson from "./hadith-books.json";
 import { DUAS, NAMES, PHRASES } from "./content";
 import { t, type Key } from "./i18n";
-import { loadHadith, loadVerses, saveQuran, searchCities, translationEdition, type HadithRow, type Verse } from "./api";
+import { loadHadith, loadVerses, reverseGeocode, saveQuran, searchCities, translationEdition, type HadithRow, type Verse } from "./api";
 import { arrowDegrees, compassPoint, declination, magneticHeading, trueHeading, turnDelta } from "./qibla";
 import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
 import { fetchWaqtStats, trackWaqtUse, type WaqtStats } from "./stats";
@@ -164,6 +164,33 @@ function App() {
   useEffect(() => {
     void trackWaqtUse();
   }, []);
+
+  useEffect(() => {
+    if (place || settings.autoLocation === false) return;
+    if (!navigator.geolocation) return;
+    let cancelled = false;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        if (cancelled || placeRef.current) return;
+        const { latitude, longitude } = pos.coords;
+        const label = await reverseGeocode(latitude, longitude);
+        if (cancelled || placeRef.current) return;
+        setPlace({
+          label,
+          latitude,
+          longitude,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+      },
+      () => {
+        /* user can set address manually */
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [place, settings.autoLocation]);
 
   useEffect(() => {
     const fired = new Set<string>();
@@ -342,16 +369,18 @@ function Icon({ name }: { name: Screen }) {
   );
 }
 
-function CitySearch({ onPick }: { onPick: (p: Place) => void }) {
+function CitySearch({ onPick, showToggles = false }: { onPick: (p: Place) => void; showToggles?: boolean }) {
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Place[]>([]);
   const [busy, setBusy] = useState(false);
   const [gpsError, setGpsError] = useState(false);
-  const { settings } = useModel();
-  const lang = settings.lang;
+  const [gpsBusy, setGpsBusy] = useState(false);
+  const m = useModel();
+  const lang = m.settings.lang;
+  const autoOn = m.settings.autoLocation !== false;
 
   useEffect(() => {
-    if (q.trim().length < 2) {
+    if (q.trim().length < 3) {
       setHits([]);
       return;
     }
@@ -366,7 +395,7 @@ function CitySearch({ onPick }: { onPick: (p: Place) => void }) {
       } finally {
         setBusy(false);
       }
-    }, 250);
+    }, 280);
     return () => {
       window.clearTimeout(timer);
       ac.abort();
@@ -379,43 +408,57 @@ function CitySearch({ onPick }: { onPick: (p: Place) => void }) {
       setGpsError(true);
       return;
     }
+    setGpsBusy(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
-        let label = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
-        try {
-          const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-          if (res.ok) {
-            const data = (await res.json()) as { city?: string; locality?: string; countryName?: string };
-            const city = data.city || data.locality;
-            if (city) label = [city, data.countryName].filter(Boolean).join(", ");
-          }
-        } catch {
-          /* coordinates are enough */
-        }
+        const label = await reverseGeocode(latitude, longitude);
         onPick({ label, latitude, longitude, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+        setGpsBusy(false);
       },
-      () => setGpsError(true),
-      { enableHighAccuracy: true, timeout: 10000 },
+      () => {
+        setGpsError(true);
+        setGpsBusy(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000 },
     );
   }
 
   return (
     <div className="search">
-      <button className="primary" onClick={locate}>
-        {t(lang, "useMyLocation")}
+      {showToggles && (
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={autoOn}
+            onChange={(e) => m.setSettings({ ...m.settings, autoLocation: e.target.checked })}
+          />
+          {t(lang, "autoLocation")}
+        </label>
+      )}
+      {showToggles && <p className="fine">{t(lang, "autoLocationHelp")}</p>}
+      <button className="primary" type="button" disabled={!autoOn || gpsBusy} onClick={locate}>
+        {gpsBusy ? t(lang, "searching") : t(lang, "useMyLocation")}
       </button>
+      {!autoOn && <p className="muted">{t(lang, "locationServiceOff")}</p>}
       {gpsError && <p className="warn">{t(lang, "locationFailed")}</p>}
       <label>
-        <span>{t(lang, "searchCity")}</span>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t(lang, "searchCity")} />
+        <span>{t(lang, "fullAddress")}</span>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t(lang, "fullAddressHint")}
+          autoComplete="street-address"
+        />
       </label>
       {busy && <p className="muted">{t(lang, "searching")}</p>}
-      {!busy && q.trim().length >= 2 && hits.length === 0 && <p className="muted">{t(lang, "noPlaces")}</p>}
+      {!busy && q.trim().length >= 3 && hits.length === 0 && <p className="muted">{t(lang, "noPlaces")}</p>}
       <ul className="hits">
         {hits.map((hit) => (
-          <li key={`${hit.latitude}-${hit.longitude}`}>
-            <button onClick={() => onPick(hit)}>{hit.label}</button>
+          <li key={`${hit.latitude}-${hit.longitude}-${hit.label}`}>
+            <button type="button" onClick={() => onPick(hit)}>
+              {hit.label}
+            </button>
           </li>
         ))}
       </ul>
@@ -906,6 +949,22 @@ function Tasbih(m: Model) {
   const item = PHRASES[phrase] ?? PHRASES[0];
   const mine = stats[item.id] ?? { rounds: 0, taps: 0 };
 
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key === "waqt-tasbih") setStats(loadTasbihStats());
+    }
+    function onReset() {
+      setStats(loadTasbihStats());
+      setCount(0);
+    }
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("waqt-tasbih-reset", onReset);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("waqt-tasbih-reset", onReset);
+    };
+  }, []);
+
   function tap() {
     if (navigator.vibrate) navigator.vibrate(8);
     const nextCount = count + 1;
@@ -948,7 +1007,8 @@ function Tasbih(m: Model) {
       <div className="tasbih-body">
         <aside className="phrase-list" aria-label="Phrases">
           {PHRASES.map((p, i) => {
-            const s = stats[p.id];
+            const s = stats[p.id] ?? { rounds: 0, taps: 0 };
+            const show = s.rounds > 0 || s.taps > 0;
             return (
               <button
                 key={p.id}
@@ -961,7 +1021,11 @@ function Tasbih(m: Model) {
               >
                 <span className="phrase-item-en">{p.en}</span>
                 <span className="arabic phrase-item-ar">{p.ar}</span>
-                {s && s.taps > 0 ? <small className="chip-stat">{s.taps}</small> : null}
+                {show ? (
+                  <small className="chip-stat" title={`${t(lang, "roundsDone")}: ${s.rounds} · ${t(lang, "totalTaps")}: ${s.taps}`}>
+                    {s.rounds}r · {s.taps}
+                  </small>
+                ) : null}
               </button>
             );
           })}
@@ -994,9 +1058,10 @@ function Tasbih(m: Model) {
               setCount(0);
             }}
           >
-            {t(lang, "reset")}
+            {t(lang, "resetRound")}
           </button>
-          <p className="build-tag">Waqt 2.5</p>
+          <p className="fine">{t(lang, "roundsStayNote")}</p>
+          <p className="build-tag">Waqt 2.6</p>
         </div>
       </div>
     </section>
@@ -1130,7 +1195,7 @@ function SettingsView(m: Model) {
         <article className="card">
           <h2>{t(lang, "location")}</h2>
           {m.place && <p className="lede">{m.place.label}</p>}
-          <CitySearch onPick={m.setPlace} />
+          <CitySearch onPick={m.setPlace} showToggles />
         </article>
         <article className="card">
           <h2>{t(lang, "calculation")}</h2>
@@ -1253,6 +1318,21 @@ function SettingsView(m: Model) {
               <strong>{stats ? stats.downloads : "—"}</strong>
             </p>
           </div>
+        </article>
+        <article className="card">
+          <h2>{t(lang, "tasbihData")}</h2>
+          <p className="fine">{t(lang, "tasbihDataHelp")}</p>
+          <button
+            type="button"
+            className="primary"
+            onClick={() => {
+              if (!window.confirm(t(lang, "resetTasbihConfirm"))) return;
+              localStorage.removeItem("waqt-tasbih");
+              window.dispatchEvent(new Event("waqt-tasbih-reset"));
+            }}
+          >
+            {t(lang, "resetAllTasbih")}
+          </button>
         </article>
       </div>
     </section>
