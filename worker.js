@@ -18,8 +18,11 @@ export default {
     const headers = new Headers(res.headers);
     headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
     headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
     headers.set("CDN-Cache-Control", "no-store");
     headers.set("Cloudflare-CDN-Cache-Control", "no-store");
+    headers.set("Clear-Site-Data", '"cache"');
+    headers.set("Surrogate-Control", "no-store");
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   },
 };
