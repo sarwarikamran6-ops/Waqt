@@ -1,3 +1,7 @@
+import type { TranslationLang } from "./translations";
+
+export type { TranslationLang };
+
 export type Lang = "en" | "ar" | "fr";
 export type Theme = "light" | "dark" | "system";
 export type MadhabKey = "shafi" | "hanafi";
@@ -45,6 +49,7 @@ export type Settings = {
   madhab: MadhabKey;
   highLat: HighLat;
   lang: Lang;
+  translationLang: TranslationLang;
   theme: Theme;
   chime: boolean;
   notify: boolean;
@@ -83,6 +88,7 @@ export const DEFAULT_SETTINGS: Settings = {
   madhab: "shafi",
   highLat: "middleofthenight",
   lang: "en",
+  translationLang: "en",
   theme: "system",
   chime: true,
   notify: false,

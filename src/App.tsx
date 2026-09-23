@@ -9,7 +9,8 @@ import { loadHadith, loadVerses, reverseGeocode, saveQuran, searchCities, transl
 import { arrowDegrees, compassPoint, declination, magneticHeading, trueHeading, turnDelta } from "./qibla";
 import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
 import { fetchWaqtStats, trackWaqtUse, type WaqtStats } from "./stats";
-import { DEFAULT_SETTINGS, METHODS, SALAHS, type Fav, type Place, type Salah, type Screen, type Settings, type Slot } from "./types";
+import { DEFAULT_SETTINGS, METHODS, SALAHS, type Fav, type Place, type Salah, type Screen, type Settings, type Slot, type TranslationLang } from "./types";
+import { TRANSLATIONS } from "./translations";
 
 type Chapter = { n: number; en: string; name: string; ar: string; verses: number; place: string };
 const CHAPTERS = chaptersJson as Chapter[];
@@ -28,7 +29,11 @@ function read<T>(key: string, fallback: T): T {
 
 function loadSettings(): Settings {
   const s = read("waqt-settings", DEFAULT_SETTINGS);
-  return { ...DEFAULT_SETTINGS, ...s, offsets: { ...DEFAULT_SETTINGS.offsets, ...(s.offsets ?? {}) } };
+  const merged = { ...DEFAULT_SETTINGS, ...s, offsets: { ...DEFAULT_SETTINGS.offsets, ...(s.offsets ?? {}) } };
+  if (!merged.translationLang) {
+    merged.translationLang = merged.lang === "fr" ? "fr" : merged.lang === "ar" ? "none" : "en";
+  }
+  return merged;
 }
 
 function loadPlace(): Place | null {
@@ -647,19 +652,23 @@ function Quran(m: Model) {
   const lang = m.settings.lang;
   const [q, setQ] = useState("");
   const [n, setN] = useState(1);
-  const [showTr, setShowTr] = useState(lang !== "ar");
+  const edition = translationEdition(m.settings.translationLang || m.settings.lang);
+  const [showTr, setShowTr] = useState(!!edition);
   const [arabic, setArabic] = useState<Verse[]>([]);
   const [translated, setTranslated] = useState<Verse[]>([]);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState(false);
   const [tick, setTick] = useState(0);
-  const edition = translationEdition(lang);
   const chapter = CHAPTERS.find((c) => c.n === n) ?? CHAPTERS[0];
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return CHAPTERS;
     return CHAPTERS.filter((c) => `${c.n} ${c.en} ${c.name} ${c.ar}`.toLowerCase().includes(needle));
   }, [q]);
+
+  useEffect(() => {
+    setShowTr(!!edition);
+  }, [edition]);
 
   useEffect(() => {
     let live = true;
@@ -1069,7 +1078,7 @@ function Tasbih(m: Model) {
             {t(lang, "resetCounts")}
           </button>
           <p className="fine">{t(lang, "roundsStayNote")}</p>
-          <p className="build-tag">Waqt 2.7</p>
+          <p className="build-tag">Waqt 2.8</p>
         </div>
       </div>
     </section>
@@ -1257,6 +1266,21 @@ function SettingsView(m: Model) {
             <button className={s.lang === "ar" ? "on" : ""} onClick={() => patch({ lang: "ar" })}>{t(lang, "arabic")}</button>
             <button className={s.lang === "fr" ? "on" : ""} onClick={() => patch({ lang: "fr" })}>{t(lang, "french")}</button>
           </div>
+          <h2>{t(lang, "quranTranslation")}</h2>
+          <p className="fine">{t(lang, "quranTranslationHelp")}</p>
+          <label>
+            {t(lang, "translationLanguage")}
+            <select
+              value={s.translationLang || "en"}
+              onChange={(e) => patch({ translationLang: e.target.value as TranslationLang })}
+            >
+              {TRANSLATIONS.map((opt) => (
+                <option key={opt.id} value={opt.id}>
+                  {opt.label} — {opt.native}
+                </option>
+              ))}
+            </select>
+          </label>
         </article>
         <article className="card">
           <h2>{t(lang, "reminders")}</h2>
@@ -1304,7 +1328,7 @@ function SettingsView(m: Model) {
             onClick={() => {
               setDone(false);
               setProgress(0);
-              void saveQuran(translationEdition(s.lang), (n) => setProgress(n)).then(() => setDone(true));
+              void saveQuran(translationEdition(s.translationLang || s.lang), (n) => setProgress(n)).then(() => setDone(true));
             }}
           >
             {t(lang, "offlineQuran")}

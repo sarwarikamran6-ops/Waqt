@@ -216,7 +216,7 @@ input, select {
 .surah-head { margin-bottom: 8px; }
 .verses li, .hadiths li { padding: 8px 0 16px; border-bottom: 1px solid var(--line); }
 .verse-tools { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.tr { color: var(--muted); }
+.tr { color: var(--muted); direction: auto; unicode-bidi: plaintext; }
 .star { width: 36px; height: 36px; border-radius: 99px; color: var(--gold); font-size: 18px; }
 .star.on { background: #17352a; color: var(--gold); }
 .book-row, .chips, .seg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }

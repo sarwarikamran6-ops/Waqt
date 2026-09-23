@@ -1,3 +1,5 @@
+import { editionForTranslation } from "./translations";
+
 const memory = new Map<string, unknown>();
 
 async function getJson<T>(url: string): Promise<T> {
@@ -40,9 +42,7 @@ const QURAN = "https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions";
 const HADITH = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions";
 
 export function translationEdition(lang: string): string | null {
-  if (lang === "fr") return "fra-muhammadhamidul";
-  if (lang === "ar") return null;
-  return "eng-mohammedmarmadu";
+  return editionForTranslation(lang);
 }
 
 export async function loadVerses(edition: string, chapter: number): Promise<Verse[]> {
