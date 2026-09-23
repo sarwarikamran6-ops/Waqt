@@ -962,16 +962,15 @@ function Tasbih(m: Model) {
           );
         })}
       </div>
-      <button className="pad" onClick={tap}>
+      <p className="pad-label">
         <span className="arabic phrase">{item.ar}</span>
         <span className="pad-en">{item.en}</span>
+      </p>
+      <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count}`}>
         <strong>{count}</strong>
         <em>
-          {t(lang, "thisRound")} · {t(lang, "target")} {target}
+          {t(lang, "thisRound")} · {target}
         </em>
-        <span className="pad-total">
-          {t(lang, "totalTaps")}: {mine.taps}
-        </span>
       </button>
       <div className="tasbih-stats">
         <p>
