@@ -75,19 +75,26 @@ body { background: var(--paper); overscroll-behavior: none; }
   text-align: start;
 }
 .nav-btn.on { background: rgba(224, 192, 122, 0.16); color: var(--gold); }
-.nav { scrollbar-width: none; }
+.nav {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 .stage {
   overflow: auto;
   padding: calc(16px + env(safe-area-inset-top)) 24px calc(20px + env(safe-area-inset-bottom));
   height: 100dvh;
   min-height: 0;
+  scrollbar-width: thin;
 }
 .stage:has(.tasbih) {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  scrollbar-width: none;
 }
+.stage:has(.tasbih)::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .stage:has(.tasbih) > .banner { flex: 0 0 auto; }
 .stage:has(.tasbih) > .tasbih { flex: 1 1 auto; min-height: 0; }
 .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 18px; }
@@ -225,21 +232,27 @@ input, select {
   gap: 6px;
   justify-content: flex-start;
   padding-bottom: 2px;
+  scrollbar-width: none;
 }
+.tasbih::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .tasbih .chips {
   width: 100%;
-  max-height: none;
-  overflow-x: auto;
-  overflow-y: hidden;
-  margin-bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
   flex: 0 0 auto;
-  flex-wrap: nowrap;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 2px;
+  max-height: none;
 }
-.tasbih .chips::-webkit-scrollbar { display: none; }
-.tasbih .chips .chip { flex: 0 0 auto; white-space: nowrap; }
+.tasbih .chips .chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 6px 10px;
+  font-size: 0.92rem;
+}
 .tasbih .top h1 { font-size: clamp(1.35rem, 3.2vw, 1.9rem); }
 .tasbih .top { margin-bottom: 4px; }
 .compass-wrap {
