@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { appYear, codeMatches, unlockIsCurrent } from "./free-code";
 import chaptersJson from "./chapters.json";
@@ -106,6 +107,8 @@ function App() {
   const [now, setNow] = useState(() => Date.now());
   const [banner, setBanner] = useState<string | null>(null);
   const [free, setFree] = useState(() => {
+    // Paid / sideloaded Android APK opens straight into the app.
+    if (Capacitor.isNativePlatform()) return true;
     if (unlockIsCurrent(localStorage.getItem("waqt-free-year"))) return true;
     return appYear() === 1 && localStorage.getItem("waqt-free") === "1";
   });
@@ -874,46 +877,109 @@ function QiblaView(m: Model) {
   );
 }
 
+type TasbihStats = Record<string, { rounds: number; taps: number }>;
+
+function loadTasbihStats(): TasbihStats {
+  try {
+    return JSON.parse(localStorage.getItem("waqt-tasbih") || "{}") as TasbihStats;
+  } catch {
+    return {};
+  }
+}
+
+function saveTasbihStats(next: TasbihStats) {
+  localStorage.setItem("waqt-tasbih", JSON.stringify(next));
+}
+
 function Tasbih(m: Model) {
   ModelCtx.current = m;
   const lang = m.settings.lang;
   const [phrase, setPhrase] = useState(0);
   const [count, setCount] = useState(0);
   const [target, setTarget] = useState(33);
-  const item = PHRASES[phrase];
+  const [stats, setStats] = useState<TasbihStats>(loadTasbihStats);
+  const item = PHRASES[phrase] ?? PHRASES[0];
+  const mine = stats[item.id] ?? { rounds: 0, taps: 0 };
+
+  function tap() {
+    if (navigator.vibrate) navigator.vibrate(8);
+    const nextCount = count + 1;
+    if (nextCount >= target) {
+      setStats((prev) => {
+        const cur = prev[item.id] ?? { rounds: 0, taps: 0 };
+        const next = {
+          ...prev,
+          [item.id]: { rounds: cur.rounds + 1, taps: cur.taps + nextCount },
+        };
+        saveTasbihStats(next);
+        return next;
+      });
+      setCount(0);
+      return;
+    }
+    setCount(nextCount);
+  }
+
   return (
     <section className="tasbih">
       <header className="top">
         <h1>{t(lang, "tasbih")}</h1>
         <div className="seg">
-          {[33, 34, 99, 100].map((n) => (
-            <button key={n} className={target === n ? "on" : ""} onClick={() => setTarget(n)}>
+          {[33, 99, 100].map((n) => (
+            <button
+              key={n}
+              className={target === n ? "on" : ""}
+              onClick={() => {
+                setTarget(n);
+                setCount(0);
+              }}
+            >
               {n}
             </button>
           ))}
         </div>
       </header>
       <div className="chips">
-        {PHRASES.map((p, i) => (
-          <button key={p.en} className={i === phrase ? "chip on" : "chip"} onClick={() => { setPhrase(i); setCount(0); }}>
-            {p.en}
-          </button>
-        ))}
+        {PHRASES.map((p, i) => {
+          const s = stats[p.id];
+          return (
+            <button
+              key={p.id}
+              className={i === phrase ? "chip on" : "chip"}
+              onClick={() => {
+                setPhrase(i);
+                setCount(0);
+              }}
+            >
+              {p.en}
+              {s && s.rounds > 0 ? <small className="chip-stat">{s.rounds}</small> : null}
+            </button>
+          );
+        })}
       </div>
-      <button
-        className={count >= target ? "pad done" : "pad"}
-        onClick={() => {
-          setCount((c) => c + 1);
-          if (navigator.vibrate) navigator.vibrate(8);
-        }}
-      >
+      <button className="pad" onClick={tap}>
         <span className="arabic phrase">{item.ar}</span>
         <strong>{count}</strong>
         <em>
-          {t(lang, "target")} {target}
+          {t(lang, "thisRound")} · {t(lang, "target")} {target}
         </em>
       </button>
-      <button className="text" onClick={() => setCount(0)}>
+      <div className="tasbih-stats">
+        <p>
+          <span>{t(lang, "roundsDone")}</span>
+          <strong>{mine.rounds}</strong>
+        </p>
+        <p>
+          <span>{t(lang, "totalTaps")}</span>
+          <strong>{mine.taps}</strong>
+        </p>
+      </div>
+      <button
+        className="text"
+        onClick={() => {
+          setCount(0);
+        }}
+      >
         {t(lang, "reset")}
       </button>
     </section>

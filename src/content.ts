@@ -211,12 +211,25 @@ export const DUAS: Dua[] = [
   },
 ];
 
-export const PHRASES: { ar: string; en: string }[] = [
-  { ar: "سُبْحَانَ اللَّهِ", en: "Subhan Allah" },
-  { ar: "الْحَمْدُ لِلَّهِ", en: "Alhamdulillah" },
-  { ar: "اللَّهُ أَكْبَرُ", en: "Allahu Akbar" },
-  { ar: "لَا إِلَٰهَ إِلَّا اللَّهُ", en: "La ilaha illa Allah" },
-  { ar: "أَسْتَغْفِرُ اللَّهَ", en: "Astaghfirullah" },
-  { ar: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", en: "Subhan Allah wa bihamdihi" },
-  { ar: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", en: "La hawla wa la quwwata illa billah" },
+export type Phrase = { id: string; ar: string; en: string };
+
+export const PHRASES: Phrase[] = [
+  { id: "subhanallah", ar: "سُبْحَانَ اللَّهِ", en: "Subhan Allah" },
+  { id: "alhamdulillah", ar: "الْحَمْدُ لِلَّهِ", en: "Alhamdulillah" },
+  { id: "allahu-akbar", ar: "اللَّهُ أَكْبَرُ", en: "Allahu Akbar" },
+  { id: "tahlil", ar: "لَا إِلَٰهَ إِلَّا اللَّهُ", en: "La ilaha illa Allah" },
+  { id: "istighfar", ar: "أَسْتَغْفِرُ اللَّهَ", en: "Astaghfirullah" },
+  { id: "subhan-bihamd", ar: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", en: "Subhan Allah wa bihamdihi" },
+  { id: "hawqala", ar: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", en: "La hawla wa la quwwata illa billah" },
+  { id: "ya-wakeel", ar: "يَا وَكِيلُ", en: "Ya Wakeelu" },
+  { id: "ya-razzaq", ar: "يَا رَزَّاقُ", en: "Ya Razzaqu" },
+  { id: "ya-shafi", ar: "يَا شَافِي", en: "Ya Shafi" },
+  { id: "ishfi-qawli", ar: "اللَّهُمَّ اشْفِ قَوْلِي", en: "Allahumma ishfi qawli" },
+  { id: "ya-rahman", ar: "يَا رَحْمَٰنُ", en: "Ya Rahman" },
+  { id: "ya-raheem", ar: "يَا رَحِيمُ", en: "Ya Raheem" },
+  { id: "ya-hayyu", ar: "يَا حَيُّ يَا قَيُّومُ", en: "Ya Hayyu Ya Qayyum" },
+  { id: "hasbunallah", ar: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", en: "Hasbunallahu wa ni'mal wakeel" },
+  { id: "salawat", ar: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ", en: "Allahumma salli ala Muhammad" },
+  { id: "subhan-azeem", ar: "سُبْحَانَ اللَّهِ الْعَظِيمِ", en: "Subhanallahil Azeem" },
+  { id: "bismillah", ar: "بِسْمِ اللَّهِ", en: "Bismillah" },
 ];

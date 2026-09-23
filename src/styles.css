@@ -254,6 +254,44 @@ input, select {
 .pad em { font-style: normal; color: var(--gold); }
 .phrase { font-size: 1.6rem !important; color: #f6f1e6; }
 .pad.done { outline: 6px solid var(--gold); }
+.chip { position: relative; }
+.chip-stat {
+  display: inline-flex;
+  margin-inline-start: 6px;
+  min-width: 1.35em;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(224, 192, 122, 0.22);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+}
+.chip.on .chip-stat { background: rgba(246, 241, 230, 0.18); color: #f6f1e6; }
+.tasbih-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: min(420px, 100%);
+  margin-top: 14px;
+}
+.tasbih-stats p {
+  margin: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.tasbih-stats span { color: var(--muted); font-size: 13px; }
+.tasbih-stats strong {
+  font-family: Fraunces, Georgia, serif;
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+}
 .name-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
 .name { padding: 12px; text-align: center; display: grid; gap: 4px; }
 .name small, .name em { color: var(--muted); font-style: normal; }
