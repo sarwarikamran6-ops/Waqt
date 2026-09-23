@@ -265,7 +265,8 @@ input, select {
 .hint { font-size: 22px; }
 
 .pad {
-  --pad-size: min(260px, 68vw, 38dvh);
+  /* deploy:2026-09-23T02:20Z — keep circle compact so phrase text fits on phone */
+  --pad-size: min(236px, 64vw, 34dvh);
   width: var(--pad-size);
   height: var(--pad-size);
   flex: 0 0 auto;
@@ -277,7 +278,7 @@ input, select {
   place-items: center;
   align-content: center;
   gap: 2px;
-  padding: 10% 9%;
+  padding: 9% 8%;
   box-shadow: var(--shadow);
   touch-action: manipulation;
 }
@@ -392,8 +393,8 @@ input[type="checkbox"] { accent-color: #1d6b45; width: 18px; height: 18px; }
   .stage { padding-inline: 14px; padding-block: calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-bottom)); }
   .columns, .split { grid-template-columns: 1fr; }
   .hero h2 { font-size: 48px; }
-  .pad { --pad-size: min(240px, 72vw, 34dvh); }
-  .tasbih .chips { max-height: 4.6rem; }
+  .pad { --pad-size: min(220px, 70vw, 32dvh); }
+  .tasbih .chips { max-height: 4.4rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto; }
