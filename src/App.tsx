@@ -1056,12 +1056,20 @@ function Tasbih(m: Model) {
             className="text"
             onClick={() => {
               setCount(0);
+              setStats((prev) => {
+                const next: TasbihStats = {};
+                for (const [id, s] of Object.entries(prev)) {
+                  next[id] = { rounds: s.rounds, taps: 0 };
+                }
+                saveTasbihStats(next);
+                return next;
+              });
             }}
           >
-            {t(lang, "resetRound")}
+            {t(lang, "resetCounts")}
           </button>
           <p className="fine">{t(lang, "roundsStayNote")}</p>
-          <p className="build-tag">Waqt 2.6</p>
+          <p className="build-tag">Waqt 2.7</p>
         </div>
       </div>
     </section>
