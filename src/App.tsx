@@ -904,20 +904,20 @@ function Tasbih(m: Model) {
   function tap() {
     if (navigator.vibrate) navigator.vibrate(8);
     const nextCount = count + 1;
-    if (nextCount >= target) {
-      setStats((prev) => {
-        const cur = prev[item.id] ?? { rounds: 0, taps: 0 };
-        const next = {
-          ...prev,
-          [item.id]: { rounds: cur.rounds + 1, taps: cur.taps + nextCount },
-        };
-        saveTasbihStats(next);
-        return next;
-      });
-      setCount(0);
-      return;
-    }
-    setCount(nextCount);
+    const roundDone = nextCount >= target;
+    setStats((prev) => {
+      const cur = prev[item.id] ?? { rounds: 0, taps: 0 };
+      const next = {
+        ...prev,
+        [item.id]: {
+          rounds: cur.rounds + (roundDone ? 1 : 0),
+          taps: cur.taps + 1,
+        },
+      };
+      saveTasbihStats(next);
+      return next;
+    });
+    setCount(roundDone ? 0 : nextCount);
   }
 
   return (
