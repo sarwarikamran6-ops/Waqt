@@ -252,6 +252,14 @@ input, select {
 }
 .pad strong { font-family: Fraunces, Georgia, serif; font-size: 92px; line-height: 1; font-variant-numeric: tabular-nums; }
 .pad em { font-style: normal; color: var(--gold); }
+.pad-total {
+  display: block;
+  margin-top: 8px;
+  color: #d9cbb4;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
 .phrase { font-size: 1.6rem !important; color: #f6f1e6; }
 .pad.done { outline: 6px solid var(--gold); }
 .chip { position: relative; }

@@ -952,7 +952,7 @@ function Tasbih(m: Model) {
               }}
             >
               {p.en}
-              {s && s.rounds > 0 ? <small className="chip-stat">{s.rounds}</small> : null}
+              {s && s.taps > 0 ? <small className="chip-stat">{s.taps}</small> : null}
             </button>
           );
         })}
@@ -963,6 +963,9 @@ function Tasbih(m: Model) {
         <em>
           {t(lang, "thisRound")} · {t(lang, "target")} {target}
         </em>
+        <span className="pad-total">
+          {t(lang, "totalTaps")}: {mine.taps}
+        </span>
       </button>
       <div className="tasbih-stats">
         <p>
