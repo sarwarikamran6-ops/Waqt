@@ -509,18 +509,83 @@ input[type="checkbox"] { accent-color: #1d6b45; width: 18px; height: 18px; }
   .stage { padding-inline: 12px; padding-block: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-bottom)); }
   .columns, .split { grid-template-columns: 1fr; }
   .hero h2 { font-size: 42px; }
-  .tasbih-body { grid-template-columns: minmax(120px, 0.9fr) minmax(150px, 1.1fr); gap: 8px; }
-  .pad { --pad-size: min(190px, 46vw, 40dvh); }
-  .phrase-item { padding: 8px 10px; }
-  .phrase-item-en { font-size: 0.82rem; }
-  .phrase-item-ar { font-size: 0.95rem !important; }
-  .tasbih-stats { width: min(220px, 100%); }
-  .tasbih-stats strong { font-size: 16px; }
-  .tasbih-stats p { padding: 6px 8px; }
   .qibla .hint { font-size: 1rem; }
+
+  /* Phone Tasbih: circle on top, phrases in one swipe row under it */
+  .tasbih {
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .tasbih .top {
+    margin-bottom: 2px;
+  }
+  .tasbih .top h1 {
+    font-size: 1.35rem;
+  }
+  .tasbih .seg button {
+    padding: 6px 10px;
+    min-width: 2.5rem;
+  }
+  .tasbih-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
+  .tasbih-main {
+    order: 1;
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 8px;
+    min-height: 0;
+  }
+  .phrase-list {
+    order: 2;
+    flex: 0 0 auto;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 8px;
+    height: auto;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .phrase-item {
+    width: auto;
+    min-width: max-content;
+    max-width: 11.5rem;
+    padding: 8px 12px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .phrase-item-en {
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+  .phrase-item-ar {
+    display: none;
+  }
+  .phrase-item .chip-stat {
+    position: static;
+    margin: 0;
+  }
+  .pad {
+    --pad-size: min(250px, 74vw, 44dvh);
+  }
+  .tasbih-stats {
+    width: min(280px, 100%);
+    gap: 8px;
+  }
+  .tasbih-stats strong { font-size: 18px; }
+  .tasbih-stats p { padding: 7px 10px; }
 }
 
-/* iPad / tablet portrait */
+/* iPad / tablet portrait — keep side-by-side: phrases left, circle right */
 @media (min-width: 701px) and (max-width: 1100px) {
   .shell { grid-template-columns: 92px 1fr; }
   .nav-btn span { display: none; }
@@ -531,12 +596,30 @@ input[type="checkbox"] { accent-color: #1d6b45; width: 18px; height: 18px; }
 }
 
 /* Short screens (landscape phones) */
-@media (max-height: 520px) {
-  .pad { --pad-size: min(150px, 34dvh, 34vw); }
+@media (max-height: 520px) and (max-width: 900px) {
+  .tasbih-body {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .phrase-list {
+    order: 0;
+    flex: 0 0 38%;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+  .phrase-item {
+    width: 100%;
+    max-width: none;
+    border-radius: 12px;
+  }
+  .phrase-item-ar { display: none; }
+  .tasbih-main { order: 1; flex: 1 1 auto; gap: 4px; }
+  .pad { --pad-size: min(150px, 40dvh, 40vw); }
   .tasbih-stats { display: none; }
   .build-tag { display: none; }
   .tasbih .top h1 { font-size: 1.2rem; }
-  .phrase-item-ar { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
