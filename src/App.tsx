@@ -992,7 +992,7 @@ function Tasbih(m: Model) {
       >
         {t(lang, "reset")}
       </button>
-      <p className="build-tag">Waqt 1.9</p>
+      <p className="build-tag">Waqt 2.0</p>
     </section>
   );
 }
