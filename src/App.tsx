@@ -8,6 +8,7 @@ import { t, type Key } from "./i18n";
 import { loadHadith, loadVerses, saveQuran, searchCities, translationEdition, type HadithRow, type Verse } from "./api";
 import { arrowDegrees, compassPoint, declination, magneticHeading, trueHeading, turnDelta } from "./qibla";
 import { addDays, civilFrom, dayKey, formatClock, formatGregorian, formatHijri, noonInZone, qiblaBearing, remainLabel, slotsFor, type Civil } from "./prayer";
+import { fetchWaqtStats, trackWaqtUse, type WaqtStats } from "./stats";
 import { DEFAULT_SETTINGS, METHODS, SALAHS, type Fav, type Place, type Salah, type Screen, type Settings, type Slot } from "./types";
 
 type Chapter = { n: number; en: string; name: string; ar: string; verses: number; place: string };
@@ -159,6 +160,10 @@ function App() {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, [settings.theme, settings.lang]);
+
+  useEffect(() => {
+    void trackWaqtUse();
+  }, []);
 
   useEffect(() => {
     const fired = new Set<string>();
@@ -1096,7 +1101,12 @@ function SettingsView(m: Model) {
   const lang = m.settings.lang;
   const [progress, setProgress] = useState<number | null>(null);
   const [done, setDone] = useState(false);
+  const [stats, setStats] = useState<WaqtStats | null>(null);
   const s = m.settings;
+
+  useEffect(() => {
+    void fetchWaqtStats().then(setStats);
+  }, []);
 
   function patch(partial: Partial<Settings>) {
     m.setSettings({ ...s, ...partial });
@@ -1221,6 +1231,19 @@ function SettingsView(m: Model) {
             <p className="muted">{done ? t(lang, "downloaded") : `${t(lang, "downloading")} ${progress}/114`}</p>
           )}
           <p className="fine">{t(lang, "attribution")}</p>
+        </article>
+        <article className="card">
+          <h2>{t(lang, "waqtStats")}</h2>
+          <div className="tasbih-stats">
+            <p>
+              <span>{t(lang, "uniqueUsers")}</span>
+              <strong>{stats ? stats.users : "—"}</strong>
+            </p>
+            <p>
+              <span>{t(lang, "uniqueDownloads")}</span>
+              <strong>{stats ? stats.downloads : "—"}</strong>
+            </p>
+          </div>
         </article>
       </div>
     </section>
