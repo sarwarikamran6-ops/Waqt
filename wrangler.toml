@@ -2,10 +2,14 @@ name = "waqt"
 account_id = "9b6bbff8f60aa507eb7590e74fc17eaf"
 compatibility_date = "2026-09-21"
 workers_dev = true
+main = "./worker.js"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "single-page-application"
+html_handling = "auto-trailing-slash"
+run_worker_first = true
 
 [[routes]]
 pattern = "waqt.shafiappco.com/*"

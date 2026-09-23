@@ -969,7 +969,7 @@ function Tasbih(m: Model) {
       <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count}`}>
         <strong>{count}</strong>
         <em>
-          {t(lang, "thisRound")} · {target}
+          {count}/{target}
         </em>
       </button>
       <div className="tasbih-stats">
@@ -990,6 +990,7 @@ function Tasbih(m: Model) {
       >
         {t(lang, "reset")}
       </button>
+      <p className="build-tag">Waqt 1.8</p>
     </section>
   );
 }
