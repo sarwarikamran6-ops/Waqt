@@ -950,6 +950,7 @@ function Tasbih(m: Model) {
           return (
             <button
               key={p.id}
+              type="button"
               className={i === phrase ? "chip on" : "chip"}
               onClick={() => {
                 setPhrase(i);
@@ -962,15 +963,15 @@ function Tasbih(m: Model) {
           );
         })}
       </div>
-      <p className="pad-label">
-        <span className="arabic phrase">{item.ar}</span>
-        <span className="pad-en">{item.en}</span>
-      </p>
-      <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count}`}>
-        <strong>{count}</strong>
-        <em>
-          {count}/{target}
-        </em>
+      <button type="button" className="pad" onClick={tap} aria-label={`${item.en} ${count} of ${target}`}>
+        <span className="pad-inner">
+          <span className="arabic phrase">{item.ar}</span>
+          <span className="pad-en">{item.en}</span>
+          <strong>{count}</strong>
+          <em>
+            {count}/{target}
+          </em>
+        </span>
       </button>
       <div className="tasbih-stats">
         <p>
@@ -983,6 +984,7 @@ function Tasbih(m: Model) {
         </p>
       </div>
       <button
+        type="button"
         className="text"
         onClick={() => {
           setCount(0);
@@ -990,7 +992,7 @@ function Tasbih(m: Model) {
       >
         {t(lang, "reset")}
       </button>
-      <p className="build-tag">Waqt 1.8</p>
+      <p className="build-tag">Waqt 1.9</p>
     </section>
   );
 }
